@@ -7,5 +7,5 @@ easy access for all members.
 
 - MATLAB
 - Arduino(C++)
-- ReactJs
+- Python 
 

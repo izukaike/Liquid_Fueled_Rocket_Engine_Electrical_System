@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 from itertools import count
+import subprocess
 
 # Create a Tkinter window
 root = tk.Tk()
@@ -45,7 +46,7 @@ y_values1 = [np.random.randint(0, max_data) for _ in range(num_points)]
 y_values2 = [np.random.randint(0, max_data) for _ in range(num_points)]
 y_values3 = [np.random.randint(0, max_data) for _ in range(num_points)]
 
-# Functions to update the plots
+# Functions to update the plots----------------------------------------------------------
 def update_plots():
     # we have to get rid of these global variables
     global x_values1, x_values2, x_values3, y_values1, y_values2, y_values3
@@ -90,7 +91,11 @@ def update_plots():
     canvas1.draw()
 
     root.after(1, update_plots)  # Update every 1 second
-
+# Function to runLabview
+def runLabView():
+    subprocess.run('cd C:\\Program Files (x86)\\National Instruments\\LabVIEW 2023 & dir & start LabVIEW', shell = True)
+    
+    
 # Create a button to start updating the plots
 start_button = ttk.Button(root, text="Start Plotting", command=update_plots)
 start_button.pack()
@@ -99,7 +104,13 @@ start_button.pack()
 quit_button = ttk.Button(root, text="Quit", command=root.quit)
 quit_button.pack()
 
+#
 #add valve and bs button then I will excel reading and writing code probably ina another file but if it can in the file
-# then lets make it happen
+
+# add labview button
+LabView_button = ttk.Button(root, text = "LabView", command = runLabView)
+LabView_button.pack()
+
+
 
 root.mainloop()

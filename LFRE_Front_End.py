@@ -1,4 +1,4 @@
-'''
+''''
 Contributors: Izuka Ikedionwu
     *As you edit,add, delete* please add your name :)*
 
@@ -11,7 +11,6 @@ Description:
     by functions that control valves, igniter, and updating plots
 
 Work:
-    - Plot labels
     - Plot time
     - data sync for plots
     - Labview button for MAC
@@ -46,7 +45,7 @@ arduino.port= comport
 arduino.parity=serial.PARITY_ODD
 arduino.stopbits=serial.STOPBITS_ONE
 arduino.bytesize=serial.EIGHTBITS
-arduino.timeout = 0
+arduino.timeout = 0 # this may be adjusted
 
 #clears port buffer anyhting
 if arduino.isOpen():
@@ -80,6 +79,18 @@ class RealTimePlotApp(QMainWindow):
 
         # Create three PlotWidgets
         self.plot_widgets = [pg.PlotWidget() for _ in range(3)]
+        
+        #adding labels to plots
+        label1 = pg.TextItem(text="Pressurer Transducer 1")#, anchor=(0.5, 0.5), color=(255, 0, 0))
+        self.plot_widgets[0] = pg.PlotWidget.addItem(label1)
+
+        label2 = pg.TextItem(text="Pressurer Transducer 2")#, anchor=(0.5, 0.5), color=(255, 0, 0))
+        self.plot_widgets[1] = pg.PlotWidget.addItem(label2)
+
+        label3 = pg.TextItem(text="Pressurer Transducer 3")#, anchor=(0.5, 0.5), color=(255, 0, 0))
+        self.plot_widgets[2] = pg.PlotWidget.addItem(label3)
+
+        #adding widgets to GUI
         for i in range(3):
             layout.addWidget(self.plot_widgets[i])
         
@@ -107,7 +118,7 @@ class RealTimePlotApp(QMainWindow):
         layout.addWidget(self.switch3)
     
         
-        number_button = 2
+        number_button = 3
         #initializes 2 buttons
         self.buttons = [QPushButton(f"Valve {i+1}") for i in range(number_button)]
         for i, button in enumerate(self.buttons):
@@ -115,10 +126,13 @@ class RealTimePlotApp(QMainWindow):
             button.setStyleSheet("QPushButton { background-color:white; color: black; font-size: 20px; }")
             #button setup 
             if(i == 0):
-                button.setText("LabView(Windows)")
-                button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
+                button.setText("ABORT")
+                button.clicked.connect(lambda: print("ABORT: Needs functionality"))  # Connect button click event
             if(i == 1):
                 button.setText("LabView(MAC)")
+                button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
+            if(i == 2):
+                button.setText("LabView(Windows)")
                 button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
         for i in range(number_button):
             layout.addWidget(self.buttons[i])
@@ -198,20 +212,21 @@ class RealTimePlotApp(QMainWindow):
     def update_plots(self):
         for i in range(3):
             new_data = np.roll(self.data[i], 1)
+            #reads but data from arduino
             bits1 = arduino.read(1)
-            #print(bits1)
+            #converts bytes to int
             data1 = int.from_bytes(bits1, "big")
+
             new_data[0] = data1
-            self.data[i] = data1
-            self.curves[i].setData(data1)
+            self.data[i] = new_data
+            self.curves[i].setData(new_data)
         
     
-
+#---------------------Main Function-----------------------------------------
 if __name__ == '__main__':
+    #Application set up
     app = QApplication(sys.argv)
     window = RealTimePlotApp()
     window.show()
     sys.exit(app.exec_())
-
-    
    

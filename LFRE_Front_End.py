@@ -1,4 +1,4 @@
-''''
+'''
 Contributors: Izuka Ikedionwu
     *As you edit,add, delete* please add your name :)*
 
@@ -13,8 +13,10 @@ Description:
 Work:
     - Plot time
     - data sync for plots
+    - read 5 bytes and plot 5 bytes of data each loop 
     - Labview button for MAC
     - optimize update plot loop
+    - change update plots to read 5 bytes at a time and plot 5 bytes
 
 Dependencies:
     pyqtgraph
@@ -30,7 +32,8 @@ import pyqtgraph as pg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
 import numpy as np
 import serial
-import time
+import time 
+from timeit import default_timer as timer
 import subprocess
 import numpy
 #---------------------------------------------------------------------------------------
@@ -40,12 +43,12 @@ comport = input("Enter COMPORT:")
 
 #Initialize Serial Communication with Arduino
 arduino=serial.Serial() 	
-arduino.baudrate=115200 #comm speed // has to be synced with arduino
+arduino.baudrate=57600#comm speed // has to be synced with arduino
 arduino.port= comport
 arduino.parity=serial.PARITY_ODD
 arduino.stopbits=serial.STOPBITS_ONE
 arduino.bytesize=serial.EIGHTBITS
-arduino.timeout = 0 # this may be adjusted
+arduino.timeout = 0.001# this may be adjusted
 
 #clears port buffer anyhting
 if arduino.isOpen():
@@ -56,7 +59,26 @@ if arduino.isOpen():
 
 #this delay is needed for arduino to set up
 time.sleep(2)
+#calibaration code
+sample_number = 150
+sum = 0
+bytes_read = 1
+for i in range(sample_number):
+    start = timer()
+    #reads but data from arduino
+    bits1 = arduino.read(bytes_read)
+    #converts bytes to int
+    data1 = int.from_bytes(bits1, "big")
+    end = timer()
+    sum += (end-start)
+    #out of loop
+    avg = sum/sample_number
+print("insert " + str(avg*5.1*1_000_000) + " for delayMicroSeconds in Arduino IDE")
+arduino.close()
+start_sequence = input("Enter Start Code:")
+arduino.open()
 
+arduino.reset_input_buffer()
 #Main class
 class RealTimePlotApp(QMainWindow):
     #class variables
@@ -67,7 +89,7 @@ class RealTimePlotApp(QMainWindow):
         self.pause = 1
 
         # Initialize the main window
-        self.setWindowTitle("Real-Time Plotting with PyQtGraph")
+        self.setWindowTitle("Liquid Fueled Rocket Engine GUI")
         self.setGeometry(150, 150, 1200, 800)
 
         # Create a central widget to contain the plots and buttons
@@ -79,8 +101,29 @@ class RealTimePlotApp(QMainWindow):
 
         # Create three PlotWidgets
         self.plot_widgets = [pg.PlotWidget() for _ in range(3)]
+
+        #adding labels to graph
+        self.plot_widgets[0].getPlotItem().setLabel('left','Psi')
+        self.plot_widgets[0].getPlotItem().setLabel('bottom', 'Time')
+        self.plot_widgets[0].getPlotItem().setLabel('top', 'Pressure Transducer 1')
+
+        self.plot_widgets[1].getPlotItem().setLabel('left','Psi')
+        self.plot_widgets[1].getPlotItem().setLabel('bottom', 'Time')
+        self.plot_widgets[1].getPlotItem().setLabel('top', 'Pressure Transducer 2')
+
+        self.plot_widgets[2].getPlotItem().setLabel('left','Psi')
+        self.plot_widgets[2].getPlotItem().setLabel('bottom', 'Time')
+        self.plot_widgets[2].getPlotItem().setLabel('top', 'Pressure Transducer 3')
         
+        '''
+        self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
+        self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
+
+        self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
+        self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
         #adding labels to plots
+        '''
+        '''
         label1 = pg.TextItem(text="Pressurer Transducer 1")#, anchor=(0.5, 0.5), color=(255, 0, 0))
         self.plot_widgets[0] = pg.PlotWidget.addItem(label1)
 
@@ -89,20 +132,20 @@ class RealTimePlotApp(QMainWindow):
 
         label3 = pg.TextItem(text="Pressurer Transducer 3")#, anchor=(0.5, 0.5), color=(255, 0, 0))
         self.plot_widgets[2] = pg.PlotWidget.addItem(label3)
-
+        '''
         #adding widgets to GUI
         for i in range(3):
             layout.addWidget(self.plot_widgets[i])
         
         # Create three  toggle buttons
-        self.switch1 = QPushButton("VALVE 1: OFF")
-        self.switch2 = QPushButton("VALVE 2: OFF")
-        self.switch3 = QPushButton("IGNITER")
+        self.switch1 = QPushButton("VALVE 1: CLOSED")
+        self.switch2 = QPushButton("VALVE 2: CLOSED")
+        self.switch3 = QPushButton("IGNITER: OFF")
 
         #switch 1 setup
         self.switch1.setCheckable(True)
         self.switch1.clicked.connect(self.toggle_switch1)
-        self.switch1.setStyleSheet("QPushButton { background-color: red; color: black; font-size: 20px; }")
+        self.switch1.setStyleSheet("QPushButton { background-color: greencom; color: black; font-size: 20px; }")
         layout.addWidget(self.switch1)
 
         #switch 2 setup
@@ -129,11 +172,13 @@ class RealTimePlotApp(QMainWindow):
                 button.setText("ABORT")
                 button.clicked.connect(lambda: print("ABORT: Needs functionality"))  # Connect button click event
             if(i == 1):
-                button.setText("LabView(MAC)")
-                button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
-            if(i == 2):
                 button.setText("LabView(Windows)")
                 button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
+            if(i == 2):
+                button.setText("TEST")
+                button.setStyleSheet("QPushButton { background-color: gray; color: black; font-size: 18px; }")
+                button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
+
         for i in range(number_button):
             layout.addWidget(self.buttons[i])
 
@@ -149,7 +194,7 @@ class RealTimePlotApp(QMainWindow):
             pw.setRange(xRange=[0, 60], yRange=[0, 500])
         
         # Start a timer to update the plots at regular intervals 
-        refresh_rate = 0
+        refresh_rate = 1 # 1ms
         self.timer = pg.QtCore.QTimer(self)
         self.timer.setInterval(refresh_rate)
         self.timer.timeout.connect(self.update_plots)
@@ -163,10 +208,10 @@ class RealTimePlotApp(QMainWindow):
         if sender.isChecked():
             #important line that calls valve opening/closing function the rest is aesthetic
             self.control_valve1()
-            sender.setText("VALVE 1: ON")
+            sender.setText("VALVE 1: CLOSED")
             sender.setStyleSheet("QPushButton { background-color: green; color: black; font-size: 18px; }")
         else:
-            sender.setText("VALVE 1: OFF")
+            sender.setText("VALVE 1:  OPEN")
             sender.setStyleSheet("QPushButton { background-color: red; color: black; font-size: 18px; }")
     
     def toggle_switch2(self):
@@ -174,10 +219,10 @@ class RealTimePlotApp(QMainWindow):
         if sender.isChecked():
             #important line that calls valve opening/closing function the rest is aesthetic
             self.control_valve2()
-            sender.setText("VALVE 2: ON")
+            sender.setText("VALVE 2: CLOSED")
             sender.setStyleSheet("QPushButton { background-color: green; color: black; font-size: 18px; }")
         else:
-            sender.setText("VALVE 2: OFF")
+            sender.setText("VALVE 2: OPEN")
             sender.setStyleSheet("QPushButton { background-color: red; color: black; font-size: 18px; }")
     
     def toggle_switch3(self):
@@ -207,20 +252,25 @@ class RealTimePlotApp(QMainWindow):
     def runLabView_Windows(self):
         #this is function is operating system specific and pretty much goes into the command line and oepns the LabView app
         subprocess.run('cd C:\\Program Files (x86)\\National Instruments\\LabVIEW 2023 & dir & start LabVIEW', shell = True)
-
+    
     #main function that updates plots
     def update_plots(self):
+        #print(arduino.in_waiting)
+        bytes_read = 1
         for i in range(3):
-            new_data = np.roll(self.data[i], 1)
+            #start = timer()
+            new_data = np.roll(self.data[i], bytes_read)
             #reads but data from arduino
-            bits1 = arduino.read(1)
+            bits1 = arduino.read(bytes_read)
             #converts bytes to int
             data1 = int.from_bytes(bits1, "big")
-
             new_data[0] = data1
             self.data[i] = new_data
             self.curves[i].setData(new_data)
+            end = timer()
+            #print( (end-start) * 1000)
         
+            
     
 #---------------------Main Function-----------------------------------------
 if __name__ == '__main__':

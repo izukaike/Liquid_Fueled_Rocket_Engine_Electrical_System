@@ -18,13 +18,14 @@ double pt3_data = A0;
 int data =0;
 int perc = 0;
 int cap = 1023;
+int  read_delay =   265;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
   pinMode(pt1_data,INPUT);
   pinMode(pt2_data,INPUT);
   pinMode(pt3_data,INPUT);
-  Serial.begin(115200);
+  Serial.begin(57600);
   servo1.attach(valve1);
   servo2.attach(valve2);
   servo3.attach(valve3);
@@ -59,10 +60,8 @@ void loop() {
   // reading 3 pressure transducers
    Serial.write(analogRead(pt1_data));
    //delay is needed but we should see if it can be synced
-   delay(2);
+   delayMicroseconds(read_delay);
    Serial.write(analogRead(pt2_data));
-   delay(2);
+   delayMicroseconds(read_delay);
    Serial.write(analogRead(pt3_data));
-   delay(2);
-
-}
+   delayMicroseconds(read_delay);

@@ -1,3 +1,6 @@
+/* Comments and headers still need to be added but this file 
+writes sensor data to pythona nd reds button data from python
+*/
 #include <Servo.h>
 //servo motor used for testing
 Servo servo1;
@@ -18,7 +21,9 @@ double pt3_data = A0;
 int data =0;
 int perc = 0;
 int cap = 1023;
-int  read_delay =   265;
+int  read_delay =   2000;
+int start = 0;
+int calibration_read = 0;
 
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -39,29 +44,53 @@ void loop() {
       input = Serial.read();
       //1 is sent by Python
       if(input == '1'){
-        servo1.write(180);
-        delay(250);
+        servo1.write(180);  
+      }else if(input == '4'){
         servo1.write(-180); 
-        delay(2);
        //2 is sent by Python
       }else if (input == '2'){
         servo2.write(180);
-        delay(250);
+      }else if (input == '5'){
         servo2.write(-180); 
-        delay(2);
       //3 is sent by Python
       }else if(input == '3'){
         servo3.write(180);
-        delay(250);
+      }else if(input == '6'){
         servo3.write(-180); 
-        delay(2);
       }
    }
-  // reading 3 pressure transducers
-   Serial.write(analogRead(pt1_data));
-   //delay is needed but we should see if it can be synced
-   delayMicroseconds(read_delay);
-   Serial.write(analogRead(pt2_data));
-   delayMicroseconds(read_delay);
-   Serial.write(analogRead(pt3_data));
-   delayMicroseconds(read_delay);
+
+  if(Serial.available() > 0){
+    if(Serial.read() == '8'){
+      calibration_read = 1;
+    }else if(Serial.read() == '7'){
+      calibration_read = 0;
+    }
+  }
+  if(calibration_read == 1){
+      // reading 3 pressure transducers
+      Serial.write(analogRead(pt1_data));
+      //delay is needed but we should see if it can be synced
+      delayMicroseconds(read_delay);
+      Serial.write(analogRead(pt2_data));
+      delayMicroseconds(read_delay);
+      Serial.write(analogRead(pt3_data));
+      delayMicroseconds(read_delay);
+  }
+
+  if(Serial.available() > 0){
+    if(Serial.read() == '9'){
+      start = 1;
+    }
+  }
+  if(start == 1){
+      // reading 3 pressure transducers
+      Serial.write(analogRead(pt1_data));
+      //delay is needed but we should see if it can be synced
+      delayMicroseconds(read_delay);
+      Serial.write(analogRead(pt2_data));
+      delayMicroseconds(read_delay);
+      Serial.write(analogRead(pt3_data));
+      delayMicroseconds(read_delay);
+  }
+}

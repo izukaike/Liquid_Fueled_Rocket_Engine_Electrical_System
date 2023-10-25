@@ -118,7 +118,7 @@ class RealTimePlotApp(QMainWindow):
         self.plot_widgets[2].getPlotItem().setLabel('left','Psi')
         self.plot_widgets[2].getPlotItem().setLabel('bottom', 'Time')
         self.plot_widgets[2].getPlotItem().setLabel('top', 'Pressure Transducer 3')
-        '''
+        
         '''
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')

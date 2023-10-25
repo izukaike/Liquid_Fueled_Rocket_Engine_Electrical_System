@@ -105,7 +105,7 @@ class RealTimePlotApp(QMainWindow):
 
         # Create three PlotWidgets
         self.plot_widgets = [pg.PlotWidget() for _ in range(3)]
-        '''
+        
         #adding labels to graph
         self.plot_widgets[0].getPlotItem().setLabel('left','Psi')
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'Time')
@@ -126,7 +126,7 @@ class RealTimePlotApp(QMainWindow):
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
         #adding labels to plots
-        '''
+        
         '''
         label1 = pg.TextItem(text="Pressurer Transducer 1")#, anchor=(0.5, 0.5), color=(255, 0, 0))
         self.plot_widgets[0] = pg.PlotWidget.addItem(label1)

@@ -18,11 +18,11 @@ Work:
     - optimize update plot loopc
     - change update plots to read 6 bytes at a time and plot 5 bytes
 
-Dependencies: *pip install for windows* may be different for mac
+Dependencies:
     pyqtgraph
     pyqt5
     numpy
-    pyserial 
+    serial 
     subprocess
 
     
@@ -43,12 +43,12 @@ comport = input("Enter COMPORT:")
 
 #Initialize Serial Communication with Arduino
 arduino=serial.Serial() 	
-arduino.baudrate=57600#comm speed // has to be synced with arduino
+arduino.baudrate=115200#comm speed // has to be synced with arduino
 arduino.port= comport
 arduino.parity=serial.PARITY_ODD
 arduino.stopbits=serial.STOPBITS_ONE
 arduino.bytesize=serial.EIGHTBITS
-arduino.timeout = 0.001# this may be adjusted
+arduino.timeout = 0.01# this may be adjusted
 
 #clears port buffer anyhting
 if arduino.isOpen():
@@ -60,11 +60,12 @@ if arduino.isOpen():
 #this delay is needed for arduino to set up
 time.sleep(2)
 #calibaration code
+
+'''
 sample_number = 150
 sum = 0
-bytes_read = 1
-#arduino.write(b'8')
 arduino.reset_input_buffer()
+arduino.write(b'8')
 for i in range(sample_number):
     start = timer()
     #reads but data from arduino
@@ -75,14 +76,14 @@ for i in range(sample_number):
     sum += (end-start)
     #out of loop
     avg = sum/sample_number
-#arduino.write(b'7')
+arduino.write(b'7')
 # We need a better way to calibrate
 print("insert " + str(avg*5.1*1_000_000) + " for delayMicroSeconds in Arduino IDE")
 arduino.close()
+'''
 start_sequence = input("Enter Start Code:")
-arduino.open()
-
-arduino.reset_input_buffer()
+#arduino.open()
+#arduino.reset_input_buffer()
 #Main class
 class RealTimePlotApp(QMainWindow):
     #class variables
@@ -114,11 +115,10 @@ class RealTimePlotApp(QMainWindow):
         self.plot_widgets[1].getPlotItem().setLabel('left','Psi')
         self.plot_widgets[1].getPlotItem().setLabel('bottom', 'Time')
         self.plot_widgets[1].getPlotItem().setLabel('top', 'Pressure Transducer 2')
-
         self.plot_widgets[2].getPlotItem().setLabel('left','Psi')
         self.plot_widgets[2].getPlotItem().setLabel('bottom', 'Time')
         self.plot_widgets[2].getPlotItem().setLabel('top', 'Pressure Transducer 3')
-        
+    
         '''
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
@@ -126,7 +126,7 @@ class RealTimePlotApp(QMainWindow):
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
         self.plot_widgets[0].getPlotItem().setLabel('bottom', 'X Axis Label')
         #adding labels to plots
-        
+        '''
         '''
         label1 = pg.TextItem(text="Pressurer Transducer 1")#, anchor=(0.5, 0.5), color=(255, 0, 0))
         self.plot_widgets[0] = pg.PlotWidget.addItem(label1)
@@ -182,7 +182,7 @@ class RealTimePlotApp(QMainWindow):
             if(i == 2):
                 button.setText("LabView(Windows)")
                 button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
-            if(i == 2):
+            if(i == 3):
                 button.setText("TEST")
                 button.setStyleSheet("QPushButton { background-color: gray; color: black; font-size: 18px; }")
                 button.clicked.connect(lambda: self.runLabView_Windows())  # Connect button click event
@@ -198,8 +198,8 @@ class RealTimePlotApp(QMainWindow):
         self.curves = [pw.plot(self.data[i]) for i, pw in enumerate(self.plot_widgets)]
 
         #set x limit and y limit
-        for pw in self.plot_widgets:
-            pw.setRange(xRange=[0, 60], yRange=[0, 500])
+        #for pw in self.plot_widgets:
+        #    pw.setRange(xRange=[0, 60], yRange=[0, 500])
         
         # Start a timer to update the plots at regular intervals 
         refresh_rate = 1 # 1ms
@@ -254,6 +254,7 @@ class RealTimePlotApp(QMainWindow):
     def control_valve1_close(self):
         #valve 1 sends 1 to arduino and arduino reads 1 and knows to activate valve1
         arduino.write(b'4')
+        #arduino.close()
     
     def control_valve2_open(self):
         #valve 1 sends 1 to arduino and arduino reads 1 and knows to activate valve1
@@ -279,27 +280,51 @@ class RealTimePlotApp(QMainWindow):
         #im not sure the best place to put it
         arduino.reset_input_buffer()
         arduino.write(b'9')
+        arduino.timeout = None
+        #arduino.close()
         #arduino.reset_input_buffer()
 
     #main function that updates plots
     def update_plots(self):
         #print(arduino.in_waiting)
-        bytes_read = 1
-        for i in range(3):
-            #start = timer()
-            new_data = np.roll(self.data[i], bytes_read)
+        bytes_read = 12
+        bits1 = arduino.read(bytes_read)
+        #print(bits1)
+        #print(" byte1 = " + str(bits1[0]) + " byte2 = " + str(bits1[1]) + " byte3 = " + str(bits1[2]))
+        #converts bytes to int
+        off1 = 0
+        off2 = 3
+        off3 = 6
+        off4 = 9
+        if(bits1 != b''):
+            #new_data = np.roll(self.data[0], 4)
+            new_data = np.roll(self.data[0],4)
             #reads but data from arduino
-            bits1 = arduino.read(bytes_read)
-            #converts bytes to int
-            data1 = int.from_bytes(bits1, "big")
-            new_data[0] = data1
-            self.data[i] = new_data
-            self.curves[i].setData(new_data)
-            end = timer()
-            #print( (end-start) * 1000)
+            new_data[0] = bits1[off1]
+            new_data[1] = bits1[off2]
+            new_data[2] = bits1[off3]
+            new_data[3] = bits1[off4]
+            self.data[0] = new_data
+            self.curves[0].setData(new_data)
+
+            new_data = np.roll(self.data[1], 4)
+            #reads but data from arduino
+            new_data[0] = bits1[off1+1]
+            new_data[1] = bits1[off2+1]
+            new_data[2] = bits1[off3+1]
+            new_data[3] = bits1[off4+1]
+            self.data[1] = new_data
+            self.curves[1].setData(new_data)
+
+            new_data = np.roll(self.data[2], 4)
+            new_data[0] = bits1[off1+2]
+            new_data[1] = bits1[off2+2]
+            new_data[2] = bits1[off3+2]
+            new_data[3] = bits1[off4+2]
+            #reads but data from arduino
+            self.data[2] = new_data
+            self.curves[2].setData(new_data)
         
-            
-    
 #---------------------Main Function-----------------------------------------
 if __name__ == '__main__':
     #Application set up

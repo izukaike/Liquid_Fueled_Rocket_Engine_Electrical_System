@@ -1,16 +1,15 @@
 # LFRE
 LFRE Code
 
-This is the location of the LFRE source code. It contains several iterations of front-end, back-end, and testing.
-as of 10/23/23 the  offical front--end is named front-end.
-![Screenshot (284)](https://github.com/izukaike/LFRE/assets/117411866/eac34ac9-8d4f-454e-9263-beda447aca10)
+This is the location of the LFRE source code. It contains front-end, back-end, and testing.
+as of 1/3/24 the  offical front--end is named front-end.
+<img width="960" alt="image" src="https://github.com/izukaike/LFRE/assets/117411866/d12b1c15-0224-4627-a386-ed0c50803c2d">
 
 
 
 
 
 
-- MATLAB
-- Arduino(C++)
-- Python 
+i. Front-End: Python
+ii. Back-End: C/C++) 
 

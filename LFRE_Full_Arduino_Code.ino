@@ -959,7 +959,7 @@ if(calibration_read == 1){
     //MAIN CODE THAT SENDS TO PYTHON
     //data sync
     //HANDLE COIL ON THE PYTHON SIDE  ~~ CHECK FOR FLAG
-    if(coil_on == false && ser_comm == 1)
+    if(ser_comm == 1)
     {   
     
         if( update_count % 3 == 0 )
@@ -1003,6 +1003,6 @@ if(calibration_read == 1){
     
     //always resets the coil because it lasts 1 cycle 
     //to avoid emi
-    coil_on = false;
+    //coil_on = false;
   }
 }

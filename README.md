@@ -17,7 +17,8 @@ Front End High Level Custom Class Diagram
 ![image](https://github.com/izukaike/LFRE/assets/117411866/a35300d7-1d74-4952-a840-31cc79cfeb02)
 
 Back End High Level Custom Class Diagram
-<img width="410" alt="image" src="https://github.com/izukaike/LFRE/assets/117411866/c34ecf93-0b3a-43d9-b303-453fe6619c36">
+![image](https://github.com/izukaike/LFRE/assets/117411866/1bb6164a-d5b9-45f6-aec0-fc47ca90a3a5)
+
 
 Telemetry Protocol For Engine Data Comm
 <img width="695" alt="image" src="https://github.com/izukaike/LFRE/assets/117411866/3d3a34a3-8320-4d8e-b5c5-92c287f12525">

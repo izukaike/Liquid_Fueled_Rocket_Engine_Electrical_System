@@ -5,7 +5,8 @@ Current GUI
 <img width="960" alt="image" src="https://github.com/izukaike/LFRE/assets/117411866/d12b1c15-0224-4627-a386-ed0c50803c2d">
 
 Object Oriented Breakdown of GUI
-![image](https://github.com/izukaike/LFRE/assets/117411866/016a7e1f-de6a-4cf0-af73-a8977d90f105)
+![image](https://github.com/izukaike/LFRE/assets/117411866/5eb21938-210f-447e-8852-704055861cf9)
+
 
 
 High Level ELctrical System

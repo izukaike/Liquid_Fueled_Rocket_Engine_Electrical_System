@@ -11,7 +11,7 @@ Object Oriented Breakdown of GUI
 
 
 High Level ELctrical System
-<img width="403" alt="image" src="https://github.com/izukaike/LFRE/assets/117411866/58c76b70-0411-4038-a1bd-781bb3f1a6bd">
+![image](https://github.com/izukaike/LFRE/assets/117411866/d23d8c9e-566f-4f29-9e17-bb5c3276196b)
 
 Front End High Level Custom Class Diagram
 <img width="461" alt="image" src="https://github.com/izukaike/LFRE/assets/117411866/a7b7ff5c-b6a7-445d-870b-f7cb6f4f4172">
@@ -26,4 +26,6 @@ Telemetry Protocol For Engine Data Comm
 i. Front-End: Python
 
 ii. Back-End: C/C++) 
+
+
 

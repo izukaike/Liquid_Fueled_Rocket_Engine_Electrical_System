@@ -5,7 +5,8 @@ Current GUI
 <img width="960" alt="image" src="https://github.com/izukaike/LFRE/assets/117411866/d12b1c15-0224-4627-a386-ed0c50803c2d">
 
 Object Oriented Breakdown of GUI
-![image](https://github.com/izukaike/LFRE/assets/117411866/5eb21938-210f-447e-8852-704055861cf9)
+![image](https://github.com/izukaike/LFRE/assets/117411866/d23d8c9e-566f-4f29-9e17-bb5c3276196b)
+
 
 
 

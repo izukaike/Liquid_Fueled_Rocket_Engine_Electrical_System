@@ -28,7 +28,10 @@ Object Oriented Breakdown of GUI
 Front End High Level Custom Class Diagram
 ![image](https://github.com/izukaike/LFRE/assets/117411866/a35300d7-1d74-4952-a840-31cc79cfeb02)
 
-**4. Setup**
+**4. Data Visualization and Analysis**
+
+**5. Setup**
+
 
 -FINISH-
 

@@ -7,7 +7,8 @@ High Level Eletrical System
 
 Circuit
 
-![image](https://github.com/izukaike/LFRE/assets/117411866/78cbb005-e4ce-4017-ae40-c8de560756d3)
+![image](https://github.com/izukaike/LFRE/assets/117411866/a57fed9b-923b-4e91-9299-1c6ba9c789a4)
+
 
 
 **2. Backend**

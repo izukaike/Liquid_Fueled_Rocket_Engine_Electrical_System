@@ -7,7 +7,8 @@ High Level Eletrical System
 
 Electric Circuit
 
-![Uploading image.png…]()
+![image](https://github.com/izukaike/LFRE/assets/117411866/722823ab-4891-4ab4-8056-ea249a7c9d47)
+
 
 
 

@@ -43,25 +43,41 @@ Front End High Level Custom Class Diagram
 **5. Setup**
 Hardware:
  1x Arduino Uno
+ 
  1x LED
+ 
  2x Solennoid Valve(Low Power)
+ 
  1x Solenoid Valve(High Power)
+ 
  2x Pressure Transducer (300psi)
+ 
  2x Pressure Transducer (1000psi)
+ 
  2x Relay (+5V)
+ 
  1x Relay (+12V)
+ 
  1x LS2 Coil
- 1x SparkPlug
+ 
  4x Resistors (240 but 250 recc)
+ 
  1x Voltage Regulator
+ 
  1x Aluminum Foil
+ 
  1x Car battery
+ 
  *wires*
+ 
  Software:
+ 
  Arduino IDE
+ 
  IDE that runs Python
 
 1) Upload.ino file to Arduino
+   
 2) in windows pip install all dependencies in python file
 
 

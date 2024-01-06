@@ -5,6 +5,8 @@ High Level Eletrical System
 
 **1. Hardware**
 
+Circuit
+
 ![image](https://github.com/izukaike/LFRE/assets/117411866/78cbb005-e4ce-4017-ae40-c8de560756d3)
 
 

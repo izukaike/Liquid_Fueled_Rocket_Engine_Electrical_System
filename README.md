@@ -40,6 +40,8 @@ Front End High Level Custom Class Diagram
 ![image](https://github.com/izukaike/LFRE/assets/117411866/a35300d7-1d74-4952-a840-31cc79cfeb02)
 
 **4. Data Visualization and Analysis**
+Simulated Test Data
+![image](https://github.com/izukaike/LFRE/assets/117411866/d50667d2-bd4e-412f-bb70-a2bd9097a6b4)
 
 **5. Setup**
 Hardware:

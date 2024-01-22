@@ -15,14 +15,12 @@
  *  Features:
  *  - 10-bit resolution (0-1023) w 0.98mW increments
  *  - Analog current to Psi algorithm
- *  - ignition control unit code (ECU)
  *  - controls 3 relays -> 2  solenoid valves and ignition coil
  *  - read 4 pressure transducers ~1000 psi range
  *  - Objected Oriented
  *  - completely seperate test data function
  *  - 8 bit button detection
- *  - Advanced filter Algorithm** ( MPC,Median, Notch, Guassian
- *  - PID software control ***
+ *
  *  
  *  Work:
  *  * check analog read
@@ -31,7 +29,7 @@
  *  * check serial write
  *  * check serial read
  *  * check rx buffer
- *  * check tx buffr
+ *  * check tx buffer
  *  
  *  * erase other variables
  *  

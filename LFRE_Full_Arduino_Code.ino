@@ -971,7 +971,7 @@ if(calibration_read == 1){
           status_buff.clear_i1_flag();
           //status_buff = status_buff & (~(1 << 4));
         } 
-        if(Serial.availableForWrite() > 0)
+        if(status_buff.get_buff() | 0x01 == true)
         {
             //writes pressure 1
             tele_sys.write_x_bits((int)abs_pressure_cal1);

@@ -35,7 +35,7 @@ Object Oriented Breakdown of GUI
 ![image](https://github.com/izukaike/LFRE/assets/117411866/48289045-6080-4dde-8877-083b49efc8dc)
 
   
-Front End High Level Custom Class Diagram
+Front End High Level Custom Class Diagram (graph class)
 
 ![image](https://github.com/izukaike/LFRE/assets/117411866/a35300d7-1d74-4952-a840-31cc79cfeb02)
 
@@ -45,9 +45,9 @@ Simulated Test Data
 
 ![image](https://github.com/izukaike/LFRE/assets/117411866/74b8d274-be12-4372-a3ec-ba1d2e7020f8)
 
-*analysis needed*
 
 **5. Setup**
+
 Hardware:
  1x Arduino Uno
  

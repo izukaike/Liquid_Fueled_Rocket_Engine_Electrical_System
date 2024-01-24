@@ -12,15 +12,6 @@
  *  in between is operation specific ( abort handling and test specific code 
  *  serves as middle tech PYTHON->ARDUINO->ELECTRONICS 
  *  
- *  Features:
- *  - 10-bit resolution (0-1023) w 0.98mW increments
- *  - Analog current to Psi algorithm
- *  - controls 3 relays -> 2  solenoid valves and ignition coil
- *  - read 4 pressure transducers ~1000 psi range
- *  - Objected Oriented
- *  - completely seperate test data function
- *  - 8 bit button detection
- *
  *  
  *  Work:
  *  * check analog read
@@ -29,7 +20,7 @@
  *  * check serial write
  *  * check serial read
  *  * check rx buffer
- *  * check tx buffer
+ *  * check tx buffr
  *  
  *  * erase other variables
  *  
@@ -316,6 +307,7 @@ class abort_framework{
          */
         bool abort_a1(float v1)
         {
+          //ISHAAN change the bounds for ducer that reads chamber pressure
           return v1 > 1000 || v1 < 0;
         }
         /*check abort conditions for ducer 2
@@ -326,6 +318,7 @@ class abort_framework{
          */
         bool abort_a2(float v1)
         {
+          // //ISHAAN change the bounds for ducer that reads 
           return v1 > 1000 || v1 < 0;
         }
         /*check abort conditions for ducer 3
@@ -336,6 +329,7 @@ class abort_framework{
          */
         bool abort_a3(float v1)
         {
+           //ISHAAN change the bounds for ducer that reads chamber side closest to handle
           return v1 > 1000 || v1 < 0;
         }
         /*check abort conditions for ducer 4
@@ -346,7 +340,13 @@ class abort_framework{
          */
         bool abort_a4(float v1)
         {
+          //ISHAAN change the bounds for ducer that reads opposite chamber side closest to handle
           return v1 > 1000 || v1 < 0;
+        }
+        //ISHAAN PATEL
+        void ISHAANS_FUNCTION()
+        {
+          //TODO
         }
         
     private:
@@ -632,7 +632,7 @@ float abs_pressure_cal4;
 int buff_check_led = 10;
 
 //button handling variable
-int rx_byte;
+int rx_byte[5] = {0,0,0,0,0};
 //coil emi protection variables 
 bool coil_on = false;
 int data = 0;
@@ -652,7 +652,7 @@ float pressure2;
 float pressure3;
 float pressure4;
 
-int sample_rate = 20;
+int sample_rate = 1;
 
 float current_sum1 = 0;
 float current_sum2 = 0;
@@ -709,17 +709,18 @@ void loop()
    delayMicroseconds(ser_comm_delay);
    avail_bytes = Serial.available();
    //if byte is in rx buff?
-   if(avail_bytes  > 0){
+   for(int i = 0; i < avail_bytes;++i)
+   {
+      //read command from pc
+      rx_byte[i] = Serial.read();
       
-  
-      rx_byte = Serial.read();
       delayMicroseconds(ser_comm_delay);
 
-      if( button.valid_serial_read(rx_byte)){
+      if( button.valid_serial_read(rx_byte[i])){
           delayMicroseconds(ser_comm_delay);
           
                //OPENS VALVE 1
-          if(button.open_valve1(rx_byte))
+          if(button.open_valve1(rx_byte[i]))
           {
               valve1.open_valve();
               
@@ -727,14 +728,14 @@ void loop()
               
               //CLOSES VALVE 1  
           }
-          else if(button.close_valve1(rx_byte))
+          else if(button.close_valve1(rx_byte[i]))
           {
               valve1.close_valve();
               status_buff.clear_v1_flag();
               
               //OPENS VALVE 2
           }
-          else if (button.open_valve2(rx_byte))
+          else if (button.open_valve2(rx_byte[i]))
           {
               valve2.open_valve();
               status_buff.set_v2_flag();
@@ -742,7 +743,7 @@ void loop()
               
               //CLOSES VALVE 2
           }
-          else if (button.close_valve2(rx_byte))
+          else if (button.close_valve2(rx_byte[i]))
           {
               valve2.close_valve();
               status_buff.clear_v2_flag();
@@ -750,13 +751,13 @@ void loop()
               
               //SIGNAL TO START SENDING DATA
           }
-          else if(button.start_sending_data(rx_byte))
+          else if(button.start_sending_data(rx_byte[i]))
           {
               start_sending_data = 1;
         
               //ACTIVATES COIL
           }
-          else if(button.spark_coil(rx_byte))
+          else if(button.spark_coil(rx_byte[i]))
           {
               status_buff.set_i1_flag();
               //status_buff = status_buff | (1 << 4);
@@ -764,32 +765,32 @@ void loop()
               c1.spark();
               
           }
-          else if(button.apply_safety_test_measures(rx_byte))
+          else if(button.apply_safety_test_measures(rx_byte[i]))
           {
               start_test_measures = 1;
               
               //CALIBRATES TRANSDUCER FOR OFFSET
           }
-          else if(button.calibrate_offset(rx_byte))
+          else if(button.calibrate_offset(rx_byte[i]))
           {
               calibration_read = 1;
 
               //DEACTIVATES COMMM 
           }
-          else if(button.deactivate_comm(rx_byte))
+          else if(button.deactivate_comm(rx_byte[i]))
           {
               ser_comm = 0;
               status_buff.reset_register();
               //status_buff = 0b00000001;
               //ACTIVATES COMMM 
           }
-          else if(button.activate_comm(rx_byte))
+          else if(button.activate_comm(rx_byte[i]))
           {
               ser_comm = 1;
             
             //SEND TEST DATA
           }
-          else if(button.use_test_data(rx_byte))
+          else if(button.use_test_data(rx_byte[i]))
           {
               use_test_data = 1;
               status_buff.reset_register();
@@ -919,35 +920,43 @@ if(calibration_read == 1){
     {
         if(abort_check.abort_a1((int)abs_pressure_cal1))
         {
+            valve1.close_valve();
+            valve2.close_valve();
             status_buff.set_a1_flag();
             //status_buff = status_buff | (1 << 3);
         }
         
         if(abort_check.abort_a2((int)abs_pressure_cal2))
         {
+             valve1.close_valve();
+             valve2.close_valve();
              status_buff.set_a2_flag();
              //status_buff = status_buff | (1 << 2);
         }
     
         if(abort_check.abort_a3((int)abs_pressure_cal3))
-        {
+        {    
+             valve1.close_valve();
+             valve2.close_valve();
              status_buff.set_a3_flag();
              //status_buff = status_buff | (1 << 1);
         }
  
         if(abort_check.abort_a4((int)abs_pressure_cal4))
         {
+             valve1.close_valve();
+             valve2.close_valve();
              status_buff.set_a4_flag();
              //status_buff = status_buff | (1 << 7);
         }
     }
     abs_pressure_cal1 = 250;
-      abs_pressure_cal2 = 250;
-      abs_pressure_cal3 = 768;
-      abs_pressure_cal4 = 768; 
+    abs_pressure_cal2 = 250;
+    abs_pressure_cal3 = 768;
+    abs_pressure_cal4 = 768; 
      // start bit is 0x01 so default is 0x02 and 0x04 so start bit is in 
      // correct position for data sync on serial comm with python
-     if(start_sending_data == 0 && ser_comm == 0 && update_count != 3){
+     if(start_sending_data == 0 && ser_comm == 0 && update_count % 3 != 0){
       abs_pressure_cal1 = 2;
       abs_pressure_cal2 = 2;
       abs_pressure_cal3 = 2;
@@ -969,7 +978,7 @@ if(calibration_read == 1){
           status_buff.clear_i1_flag();
           //status_buff = status_buff & (~(1 << 4));
         } 
-        if(status_buff.get_buff() | 0x01 == true)
+        if(ser_comm == 1)
         {
             //writes pressure 1
             tele_sys.write_x_bits((int)abs_pressure_cal1);
@@ -985,7 +994,7 @@ if(calibration_read == 1){
             
         }
         else
-        {   //Zero means somethign bad because the lowest should be 13/14/15
+        {   //Zero means something bad because the lowest should be 13/14/15
             tele_sys.write_error_message();
         }
         
@@ -1001,6 +1010,6 @@ if(calibration_read == 1){
     
     //always resets the coil because it lasts 1 cycle 
     //to avoid emi
-    //coil_on = false;
+    coil_on = false;
   }
 }

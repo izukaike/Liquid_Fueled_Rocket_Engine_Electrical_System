@@ -44,7 +44,7 @@ class coil{
     {
       this->pin = pin;
       pinMode(pin,OUTPUT);
-      digitalWrite(pin,HIGH);
+      digitalWrite(pin,LOW);
     }
     /* sparks coil
      *  
@@ -254,11 +254,11 @@ class pressure_transducers{
           float RawVoltage = num;
       
           // Convert the raw data value (0 - 1023) to voltage (0.0V - 5.0V)
-          float Vread = RawVoltage * (5.0 / 1024.0);
+          float Vread = RawVoltage * (5.0 / 1023.0);
   
           //Voltage adj from valve circuit
   
-        return (Pmax_pt*(Vread-(I0*R)))/(R*(Imax-I0));
+        return floor((Pmax_pt*(Vread-(I0*R)))/(R*(Imax-I0)));
       }
      /*  return offet
      *  
@@ -601,6 +601,10 @@ class telemetry{
          Serial.write(0x00);
          delayMicroseconds(this->ser_comm_delay);
          Serial.write(0x00);
+      }
+      uint8_t start_byte()
+      {
+         return 0b00000111;
       }    
     private:
       int ser_comm_delay = 100;
@@ -686,6 +690,9 @@ abort_framework abort_check;
 status_register status_buff;
 telemetry tele_sys;
 
+int test_val = 52;
+int count = 0;
+int te =0;
 void setup() {
   //Serial setp and 2 second time is needed for proper usage
   Serial.begin(115200);
@@ -804,18 +811,21 @@ void loop()
 //Calibration Code // repeat just with more samples and only offset taken in consideration
 if(calibration_read == 1){
      //close valves
+     /*
     delayMicroseconds(ser_comm_delay);
     valve1.open_valve();
     valve2.open_valve();
     delayMicroseconds(ser_comm_delay);
+    */
     
   for (int i = 0; i < calibration_sample_rate; i++) {
  
         //read the raw data coming in on analog pins
-         pressure1 = press_trans1.analog_to_pressure(analogRead(pt1_data));
-         pressure2 = press_trans2.analog_to_pressure(analogRead(pt2_data));
-         pressure3 = press_trans3.analog_to_pressure(analogRead(pt3_data));
-         pressure4 = press_trans4.analog_to_pressure(analogRead(pt4_data));
+         //pressure1 = press_trans1.analog_to_pressure(analogRead(pt1_data));
+         pressure1 = press_trans1.analog_to_pressure(197);
+         pressure2 = press_trans2.analog_to_pressure(197);
+         pressure3 = press_trans3.analog_to_pressure(197);
+         pressure4 = press_trans4.analog_to_pressure(197);
          
         //computes sum the sum of sample pressures 
         current_sum1 = current_sum1 + pressure1;
@@ -862,6 +872,7 @@ if(calibration_read == 1){
             pressure2 = press_trans2.analog_to_pressure(analogRead(pt2_data));
             pressure3 = press_trans3.analog_to_pressure(analogRead(pt3_data));
             pressure4 = press_trans4.analog_to_pressure(analogRead(pt4_data));
+            
             //Serial.println(pressure1);
         //use data and memory sync to start sending test data right after memory sync -> details below
         }else if(use_test_data == 1 && memory_sync >= 2){
@@ -950,10 +961,12 @@ if(calibration_read == 1){
              //status_buff = status_buff | (1 << 7);
         }
     }
+    /*
     abs_pressure_cal1 = 250;
     abs_pressure_cal2 = 250;
     abs_pressure_cal3 = 768;
-    abs_pressure_cal4 = 768; 
+    abs_pressure_cal4 = 768;
+    */ 
      // start bit is 0x01 so default is 0x02 and 0x04 so start bit is in 
      // correct position for data sync on serial comm with python
      if(start_sending_data == 0 && ser_comm == 0 && update_count % 3 != 0){
@@ -962,6 +975,11 @@ if(calibration_read == 1){
       abs_pressure_cal3 = 2;
       abs_pressure_cal4 = 4; 
     }
+    if(abs_pressure_cal1 == 7){abs_pressure_cal1++;}
+    if(abs_pressure_cal2 == 7){abs_pressure_cal2++;}
+    if(abs_pressure_cal3 == 7){abs_pressure_cal3++;}
+    if(abs_pressure_cal4 == 7){abs_pressure_cal4++;}
+    
      
     //MAIN CODE THAT SENDS TO PYTHON
     //data sync
@@ -971,6 +989,8 @@ if(calibration_read == 1){
     
         if( update_count % 3 == 0 )
         {
+          delayMicroseconds(ser_comm_delay);
+          Serial.write(tele_sys.start_byte());
           delayMicroseconds(ser_comm_delay);
           Serial.write(status_buff.get_buffer());
           

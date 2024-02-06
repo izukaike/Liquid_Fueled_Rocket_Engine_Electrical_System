@@ -103,7 +103,7 @@ class MyWorker(QObject):
             arduino.reset_output_buffer()
 
             #waits for serial comm to refresh on mcu side
-            time.sleep(0.05)
+            time.sleep(0.5)
             
             '''
             I wanted to send the command straight from the serial port
@@ -139,6 +139,9 @@ class MyWorker(QObject):
                 window.i1 = window.data_max
         
                 #sparks every 80ms
+                '''
+                CHANGE THIS LINE TO CHANGE SPARK SPEED
+                '''
                 time.sleep(0.08)
                 i  =  i +  1
 
@@ -187,6 +190,7 @@ class MyWorker(QObject):
         time.sleep(0.1)
         #may not really be needed 
         arduino.reset_output_buffer()
+        time.sleep(0.5)
         #sends finished signal to main thread
         self.finished.emit()
             
@@ -204,9 +208,18 @@ class MyWorker(QObject):
         time.sleep(0.1)
 
         #sparks coil 5 times every 80 ms
-        for i in range(5):
+
+        for i in range(10):
+            arduino.write(b'7')
+            time.sleep(0.04)
+        time.sleep(1)
+        for i in range(10):
             arduino.write(b'7')
             time.sleep(0.08)
+        time.sleep(1)
+        for i in range(10):
+            arduino.write(b'7')
+            time.sleep(0.1)
 
         time.sleep(0.1)
         #may not be needed
@@ -879,7 +892,7 @@ class LFRE_GUI_Control_App(QMainWindow):
     returns nothing
     '''
     def update_plots(self):
-        global ar
+        global ar, sparked
         begin = time.time()
         bits1 = b''
         ar.append(begin)
@@ -975,8 +988,12 @@ class LFRE_GUI_Control_App(QMainWindow):
             #changes tolerance to stop sparking
             
             combustion_pressure = 50
-            if(self.new_data1 >= combustion_pressure): 
+            if(self.new_data1 >= combustion_pressure):
+                sparked = np.concatenate((sparked,[1]))
                 SPARKED = True
+            else:
+                parked = np.concatenate((sparked,[0]))
+
             
             #updates ducer 2 on gui
             if(medians[1] <= upper_bound and medians[1] > lower_bound and self.status[4] != 1):
@@ -1178,6 +1195,8 @@ if __name__ == '__main__':
     a3 = np.array([0])
     a4 = np.array([0])
 
+    sparked = np.array([0])
+
     x = np.array([0])
     #------------------------------------------
 
@@ -1308,7 +1327,7 @@ if __name__ == '__main__':
     for i in range(pt1.size):
         txt_file.write(str(pt1[i])+str(pt2[i])+str(pt3[i])+str(pt4[i]))
         txt_file.write(str(v1[i])+str(v2[i])+str(i1[i])+str(a1[i])+str(a2[i])) 
-        txt_file.write(str(a3[i])+str(a4[i]))
+        txt_file.write(str(a3[i])+str(a4[i])+str(sparked[i]))
         txt_file.write('\n')
     count = 0
     txt_file.close()

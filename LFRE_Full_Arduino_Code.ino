@@ -656,7 +656,7 @@ float pressure2;
 float pressure3;
 float pressure4;
 
-int sample_rate = 1;
+int sample_rate = 3;
 
 float current_sum1 = 0;
 float current_sum2 = 0;

@@ -314,7 +314,7 @@ class abort_framework{
          * 
          * passes pressure from ducer 2
          * 
-         * returns bool
+         * returns bool f
          */
         bool abort_a2(float v1)
         {
@@ -551,7 +551,7 @@ class status_register{
       }
       /*
        * return buffer
-       * 
+       * f
        * passes nothing
        * 
        * return byte/character
@@ -565,7 +565,7 @@ class status_register{
   private:
       //status buffer for testing and communicating excel and data analysis
       // register  8= pt 4, 7=v1, 6=v2, 5=i1,4=a1, 3=a2, 2=a3, 1 = start
-      char status_buff = 0b00000001; 
+      char status_buff = 0b00000001;
 };
 
 
@@ -610,7 +610,7 @@ class telemetry{
       int ser_comm_delay = 100;
   
 };
-
+//#Removes unwanted signals
 //MAYBE UNUSED
 int test = false; 
 
@@ -702,7 +702,7 @@ void setup() {
   pinMode(buff_check_led,OUTPUT);
   
   //default on so it is obvious if something went wrong
-  digitalWrite(buff_check_led,HIGH);
+  digitalWrite(buff_check_led,LOW);
   delayMicroseconds(ser_comm_delay);
 }
 
@@ -822,10 +822,19 @@ if(calibration_read == 1){
  
         //read the raw data coming in on analog pins
          //pressure1 = press_trans1.analog_to_pressure(analogRead(pt1_data));
+         /*
          pressure1 = press_trans1.analog_to_pressure(197);
          pressure2 = press_trans2.analog_to_pressure(197);
          pressure3 = press_trans3.analog_to_pressure(197);
          pressure4 = press_trans4.analog_to_pressure(197);
+         */
+        
+         
+         pressure1 = press_trans1.analog_to_pressure(analogRead(pt1_data));
+         pressure2 = press_trans2.analog_to_pressure(analogRead(pt2_data));
+         pressure3 = press_trans3.analog_to_pressure(analogRead(pt3_data));
+         pressure4 = press_trans4.analog_to_pressure(analogRead(pt4_data));
+         
          
         //computes sum the sum of sample pressures 
         current_sum1 = current_sum1 + pressure1;
@@ -926,14 +935,19 @@ if(calibration_read == 1){
     //////////////////////////////////////////////////////////////////////
     
     //Exception Code: INCOMPLETE
-    //only applied when test procedure is on
+    //only applied when test procedure is o
+    
     if(start_test_measures == 1)
     {
+        
         if(abort_check.abort_a1((int)abs_pressure_cal1))
         {
             valve1.close_valve();
             valve2.close_valve();
             status_buff.set_a1_flag();
+            digitalWrite(buff_check_led,HIGH);
+            delay(1000);
+            digitalWrite(buff_check_led,LOW);
             //status_buff = status_buff | (1 << 3);
         }
         

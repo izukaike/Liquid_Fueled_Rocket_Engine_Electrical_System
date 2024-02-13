@@ -88,9 +88,15 @@ class MyWorker(QObject):
         #access sparked variables *** this should be a member variable in gui
         global SPARKED
         global window
+        global app
 
+
+        time.sleep(1)
         #close both valves
-        arduino.write(b'34')
+        window.control_valve1_close()
+        time.sleep(0.001)
+        window.control_valve2_close()
+
         window.v1 = 0
         window.v2 = 0
 
@@ -111,13 +117,13 @@ class MyWorker(QObject):
             with out more robusts safety code 
             '''
             #open valve 1
-            arduino.write(b'2')
+            window.control_valve1_open()
             window.v2 = window.data_max
 
             time.sleep(0.001)
 
             #open valve 2
-            arduino.write(b'1')
+            window.control_valve2_open()
             window.v1 = window.data_max
 
             time.sleep(0.001)
@@ -135,7 +141,7 @@ class MyWorker(QObject):
             while five_seconds - start  < 5:
 
                 #spark coil 
-                arduino.write(b'7')
+                window.control_igniter_open()
                 window.i1 = window.data_max
         
                 #sparks every 80ms
@@ -159,12 +165,12 @@ class MyWorker(QObject):
             if(SPARKED == False):
                 
                 #close valve 1
-                arduino.write(b'4')
+                window.control_valve1_close()
                 window.v1 = 0
                 time.sleep(0.001)
 
                 #close valve 2
-                arduino.write(b'5')
+                window.control_valve2_close()
                 window.v2 = 0
                 time.sleep(0.05)
             #if combustion achieved
@@ -173,12 +179,12 @@ class MyWorker(QObject):
                 time.sleep(1)
 
                 #close both valves
-                arduino.write(b'4')
+                window.control_valve1_close()
                 window.v1 = 0
 
                 time.sleep(0.001)
                 #close valve 2
-                arduino.write(b'5')
+                window.control_valve2_close()
                 window.v2 = 0
 
                 time.sleep(0.05)
@@ -203,28 +209,8 @@ class MyWorker(QObject):
     '''
     def igniter_sequence(self):
         #resets output buffer so coil signal is first
-        arduino.reset_output_buffer()
-
-        time.sleep(0.1)
-
         #sparks coil 5 times every 80 ms
-
-        for i in range(10):
-            arduino.write(b'7')
-            time.sleep(0.04)
-        time.sleep(1)
-        for i in range(10):
-            arduino.write(b'7')
-            time.sleep(0.08)
-        time.sleep(1)
-        for i in range(10):
-            arduino.write(b'7')
-            time.sleep(0.1)
-
-        time.sleep(0.1)
-        #may not be needed
-        arduino.reset_output_buffer()
-        #sends finished signal to main thread
+        arduino.write(b'7')
         self.finished.emit()
 
 '''
@@ -727,6 +713,8 @@ class LFRE_GUI_Control_App(QMainWindow):
     returns nothing
     '''
     def control_igniter_open(self):
+        arduino.write(b'7')
+        '''
         #instantiates thread obj 
         self.thread[0] = MyThread() # added function number
         self.thread[0].function_type = 1
@@ -734,6 +722,7 @@ class LFRE_GUI_Control_App(QMainWindow):
         self.thread[0].start()
         #runs after finished threaded function
         self.thread[0].finished.connect(self.on_finished1)
+        '''
 
     '''
     prints finished thread in terminal
@@ -926,6 +915,7 @@ class LFRE_GUI_Control_App(QMainWindow):
 
             #make sure on start up there are is no 1 in 1 place for all incoming data
             #this is default status register in little endian
+            #print(self.status)
             if(self.status == [1,0,0,0,0,0,0,0]):
                 self.start_bit = 1
                     
@@ -992,25 +982,27 @@ class LFRE_GUI_Control_App(QMainWindow):
                 sparked = np.concatenate((sparked,[1]))
                 SPARKED = True
             else:
-                parked = np.concatenate((sparked,[0]))
+                sparked = np.concatenate((sparked,[0]))
 
             
             #updates ducer 2 on gui
             if(medians[1] <= upper_bound and medians[1] > lower_bound and self.status[4] != 1):
                 self.new_data2 = medians[1]
+    
            
             self.bar_item[1].setOpts(x=self.domain, height=self.new_data2)
 
             #updates gui on ducer 3
             if( medians[2] <= upper_bound and medians[2] > lower_bound and self.status[4] != 1):
                 self.new_data3 = medians[2]
+    
 
             self.bar_item[2].setOpts(x=self.domain, height=self.new_data3)
 
             #updates gui on ducer 4
             if(medians[3] <= upper_bound and medians[3] > lower_bound and self.status[4] != 1):
                 self.new_data4 = medians[3]
-
+                
             self.bar_item[3].setOpts(x=self.domain, height=self.new_data4)
             
             #to speed up runtime of function I am writing all data
@@ -1311,9 +1303,10 @@ if __name__ == '__main__':
     if window.start_recording == 1:
         subprocess.run('C:\\Users\\izuka\Documents\\A_New_Ard_Proj\\Recording_File.xlsx', shell = True)
     '''
-    root_2 = tk.Tk()
-    app_2 = FilterApp(root_2,window.i)
-    root_2.mainloop()
+    if window.start_recording == 1:
+        root_2 = tk.Tk()
+        app_2 = FilterApp(root_2,window.i)
+        root_2.mainloop()
     #clear all buffers when something messes up
     arduino.reset_output_buffer()
     #close serial port
@@ -1321,8 +1314,6 @@ if __name__ == '__main__':
     txt_file.close()
     #recording data from text file into excel
     txt_file = open("data.txt",'w')
-    if txt_file:
-        print("open")
     print( str((pt1.size*12*4) * 10**-3) + "kB's of data")
     for i in range(pt1.size):
         txt_file.write(str(pt1[i])+str(pt2[i])+str(pt3[i])+str(pt4[i]))

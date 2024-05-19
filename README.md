@@ -35,7 +35,8 @@ Current GUI *CHANGE*
 Object Oriented Breakdown of GUI
 
 
-![image](https://github.com/izukaike/LFRE/assets/117411866/48289045-6080-4dde-8877-083b49efc8dc)
+![image](https://github.com/izukaike/LFRE/assets/117411866/443ef2c0-23ee-4e44-afd9-74f7bfdb50df)
+
 
   
 Front End High Level Custom Class Diagram (graph class)

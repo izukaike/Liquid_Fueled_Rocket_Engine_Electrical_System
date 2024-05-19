@@ -1,7 +1,8 @@
 **LFRE Electrical System**
 
 High Level Eletrical System
-![image](https://github.com/izukaike/LFRE/assets/117411866/d8bb7c13-b89a-4e5e-8969-3f10823c009f)
+![image](https://github.com/izukaike/LFRE/assets/117411866/46c6f6e8-3a58-4e4c-8264-f37696fd51dd)
+
 
 
 **1. Hardware**

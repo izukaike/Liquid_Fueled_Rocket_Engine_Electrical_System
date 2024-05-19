@@ -43,7 +43,7 @@ Front End High Level Custom Class Diagram (graph class)
 
 **4. Data Visualization and Analysis**
 
-Simulated Test Data
+Data Visualization Example
 
 ![image](https://github.com/izukaike/LFRE/assets/117411866/54c4b1ac-360a-495a-aea6-3dcccd340607)
 

@@ -21,15 +21,6 @@
  *  
  *  
  *  Work:
- *  * check analog read
- *  * chek eeprom read
- *  * check eeprom write
- *  * check serial write
- *  * check serial read
- *  * check rx buffer
- *  * check tx buffr
- *  * fix eeprom default constrcutor
- *  * erase other variables
  *  
  *  Dependencies:
  *  *

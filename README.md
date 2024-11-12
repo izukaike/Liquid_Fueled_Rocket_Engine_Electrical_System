@@ -51,7 +51,4 @@ Data Visualization Example
 
  
 
-**5. Setup**
-
-
 
